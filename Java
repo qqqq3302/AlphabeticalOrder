@@ -5,6 +5,9 @@ public class Solution {
     
     public static void main(String []args){
         System.out.println(alphabeticalOrder(new String[]{"acd","ace", "bca", "bde", "ebd"}));
+        System.out.println(alphabeticalOrder(new String[]{"ab","az","bc","z"}));
+        System.out.println(alphabeticalOrder(new String[]{"a","b","a"}));
+
     }
     // The problem is similar to Topological sort, I will count number of predecessors for each character
     // And populating the characters having 0 predecessors, and decrementing the number of predecessors for     
