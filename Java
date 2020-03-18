@@ -1,0 +1,86 @@
+import java.util.*;
+
+
+public class Solution {
+    
+    public static void main(String []args){
+        System.out.println(alphabeticalOrder(new String[]{"acd","ace", "bca", "bde", "ebd"}));
+    }
+    // The problem is similar to Topological sort, I will count number of predecessors for each character
+    // And populating the characters having 0 predecessors, and decrementing the number of predecessors for     
+   //  the characters should be after these over and over again until no character left or none of            
+   //  character has 0 predecessors.
+    public static String alphabeticalOrder(String[] words) {
+        Map<Character, Set<Character>> orderMap = new HashMap<>();
+        Map<Character, Integer> degree = new HashMap<>();
+        StringBuilder result = new StringBuilder();
+       
+        // Give each character a default degree 0.
+        for (String word : words) {
+            for (char c : word.toCharArray()) {
+                degree.put(c, 0);
+            }
+        }
+       
+        char first, second;
+        for (int i=0; i<words.length-1; i++) {
+            for (int j=0; j<words[i].length(); j++) {
+                // compare two words and find the pair of characters deciding the order
+                first = words[i].charAt(j);
+                second = words[i+1].charAt(j);
+                if (first != second) {
+                    // add the pair into the orderMap.
+                    // and increment the degree of second character
+                    // if it hasn't been counted by been the successor of the first character
+                    if (!orderMap.containsKey(first)) {
+                        Set<Character> cur = new HashSet<>();
+                        cur.add(second);
+                        orderMap.put(first, cur);
+                        degree.put(second, degree.getOrDefault(second, 0) + 1);
+                    } else {
+                        if (!orderMap.get(first).contains(second)) {
+                            degree.put(second, degree.getOrDefault(second, 0) + 1);
+                        }
+                        orderMap.get(first).add(second);
+                    }
+                   
+                    break;
+                }
+            }
+        }
+       
+        // Do a BFS to retrieve a character having 0 degree every time
+        Queue<Character> queue = new LinkedList<>();
+       
+        // start from those characters have 0 degree
+        for (char c : degree.keySet()) {
+            if (degree.get(c) == 0) {
+                queue.offer(c);
+            }
+        }
+       
+        char current;
+        while (!queue.isEmpty()) {
+            current = queue.poll();
+            result.append(current);            
+            if (!orderMap.containsKey(current)) {
+                continue;
+            }
+            // decrement the degrees for successors of the character
+            for (char next : orderMap.get(current)) {
+                if (degree.containsKey(next)) {
+                    degree.put(next, degree.get(next)-1);
+                    // add it to the queue if it has 0 degree
+                    if (degree.get(next) == 0) {
+                        queue.offer(next);
+                    }
+                }
+            }
+           
+        }
+       
+        // check if the result is valid, return "" if it's invalid.
+        if (result.length() != degree.size()) return "";
+        return result.toString();
+    }
+}
